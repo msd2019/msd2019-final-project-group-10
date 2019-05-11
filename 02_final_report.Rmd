@@ -1,0 +1,71 @@
+---
+title: "MSD 2019 Final Project"
+subtitle: "A replication and extension of < PAPER TITLE > by < ORIGINAL AUTHORS >, < PUBLISHED IN >"
+author: "Your Names (your unis)"
+date: '`r Sys.time()`'
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lubridate)
+library(wikipediatrend)
+
+theme_set(theme_bw())
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load data}
+load("data/terrorism_data.RData")
+load("data/infra_data.RData")
+load("data/popular_data.RData")
+load("data/terrorism_data_long.RData")
+```
+
+```{r example}
+monthly_agg <- terrorism_data %>% 
+  group_by(month=floor_date(date, "month")) %>%
+  summarize(views=sum(views)) 
+
+monthly_agg$surveillence <- 'before'
+monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after'
+
+model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg)
+summary(model)
+
+monthly_agg$prediction <- predict(model, monthly_agg)
+monthly_agg$se <- predict(model, monthly_agg,
+                      se.fit = TRUE)$se.fit
+z.val <- qnorm(1 - (1 - 0.90)/2)
+monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se
+monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se
+
+monthly_agg$month <- ymd(monthly_agg$month)
+
+ggplot(monthly_agg,
+       aes(x = month,
+           y = prediction)) +
+  geom_smooth(aes(ymin = LoCI, 
+                  ymax = HiCI,
+                  color = surveillence),
+              stat = "identity") +
+  geom_point(data = monthly_agg, aes(x=month, y = views)) +
+  geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') +
+  ylab('Views') +
+  xlab('Time (monthly)') +
+  scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) +
+  scale_y_continuous(labels = comma)
+```
+
+
+
+
+The following is a list of all packages used to generate these results. (Leave at very end of file.)
+
+```{r}
+sessionInfo()
+```
