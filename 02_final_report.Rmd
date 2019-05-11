@@ -54,7 +54,7 @@ terrorism_data %>%
 
 ## 2.2 Linear model with interactions: Analysis and Plots
 
-```{r example}
+```{r }
 lm_plot_topic <- function(input_df, gg_title){
 
 df <- data.frame(input_df)
@@ -107,8 +107,69 @@ lm_plot_topic(popular_data, 'Popular keywords trend before and after June 2013')
 lm_plot_topic(infra_data, 'Infrastructure security-related keywords trend before and after June 2013')
 ```
 
+# 3. Extended Analysis
 
-<!-- ## Trend Recovery -->
+## 3.1 Longer Trend Analysis
+
+## 3.2 Per-keyword Analysis
+
+```{r}
+lm_plot_keyword <- function(input_df, article_name, gg_title){
+
+df <- data.frame(input_df)
+df <- df %>% 
+  group_by(article ,month=floor_date(date, "month")) %>%
+  summarize(views=sum(views)) %>%
+  filter(article == article_name)  
+
+df$surveillence <- 'before'
+df$surveillence[df$month >= '2013-06-01'] <- 'after'
+
+model <- lm(views ~ month + surveillence + month*surveillence, data = df)
+print(summary(model))
+
+
+df$prediction <- predict(model, df)
+df$se <- predict(model, df,
+                      se.fit = TRUE)$se.fit
+z.val <- qnorm(1 - (1 - 0.90)/2)
+df$LoCI <- df$prediction - z.val * df$se
+df$HiCI <- df$prediction + z.val * df$se
+
+df$month <- ymd(df$month)
+
+ggplot(df,
+       aes(x = month,
+           y = prediction)) +
+  geom_smooth(aes(ymin = LoCI, 
+                  ymax = HiCI,
+                  color = surveillence),
+              stat = "identity") +
+  geom_point(data = df, aes(x=month, y = views)) +
+  geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') +
+  ylab('Views') +
+  xlab('Time (monthly)') +
+  scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) +
+  scale_y_continuous(labels = comma) +
+  ggtitle(gg_title)
+}
+```
+
+```{r}
+lm_plot_keyword(terrorism_data, 'al-qaeda', 'Trend for \'al-qaeda\' before and after June 2013')
+```
+
+```{r}
+lm_plot_keyword(terrorism_data, 'terror', 'Trend for \'terror\' before and after June 2013')
+```
+
+```{r}
+lm_plot_keyword(terrorism_data, 'recruitment', 'Trend for \'recruitment\' before and after June 2013')
+```
+
+## 3.3 Time-series Analysis
+
+## 3.4 Trend Recovery
 
 <!-- ```{r , echo=FALSE} -->
 
