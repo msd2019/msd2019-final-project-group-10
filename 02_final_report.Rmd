@@ -1,7 +1,7 @@
 ---
 title: "MSD 2019 Final Project"
-subtitle: "A replication and extension of < PAPER TITLE > by < ORIGINAL AUTHORS >, < PUBLISHED IN >"
-author: "Your Names (your unis)"
+subtitle: "A replication and extension of hilling Effects: Online Surveillance and Wikipedia Use by Jonathon W. Penney, Berkeley Technology Law Journal"
+author: "Thanaspakorn Niyomkarn, Alex Li Kong, and Sang Won Lee (tn2381, alk2225, and sl4447)"
 date: '`r Sys.time()`'
 output:
   pdf_document:
@@ -19,12 +19,34 @@ theme_set(theme_bw())
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# 2. Reproducing the Original Study
+
 ```{r load data}
 load("data/terrorism_data.RData")
 load("data/infra_data.RData")
 load("data/popular_data.RData")
-load("data/terrorism_data_long.RData")
 ```
+
+
+
+## Total views of terrorism-related keywords before and after the incident
+
+```{r}
+terrorism_data %>%
+  mutate(before_after = ifelse(date < '2013-06-01', "Before_June_2013", "After_June_2013")) %>%
+  group_by(before_after) %>%
+  summarise(total_views = sum(views)) %>%
+  ggplot(aes(x= factor(before_after, level = c("Before_June_2013", "After_June_2013")), y=total_views, width=0.5)) +
+  scale_y_continuous(name="Total Views", labels = comma) +
+  xlab("Time") +
+  geom_text(aes(label=comma(total_views)), vjust=-0.3, color="black", size=3.5) +
+  theme_bw(base_size = 10) +
+  geom_bar(stat="identity") +
+  ggtitle("Total views of terrorism-related keywords before and after the incident")
+```
+
+
+
 
 ```{r example}
 lm_plot_topic <- function(input_df, gg_title){
@@ -65,6 +87,7 @@ ggplot(df,
   ggtitle(gg_title)
 }
 ```
+
 
 ```{r}
 lm_plot_topic(terrorism_data, 'Terrorism-related keywords trend before and after June 2013')
