@@ -27,39 +27,57 @@ load("data/terrorism_data_long.RData")
 ```
 
 ```{r example}
-monthly_agg <- terrorism_data %>% 
+lm_plot_topic <- function(input_df, gg_title){
+
+df <- data.frame(input_df)
+df <- df %>% 
   group_by(month=floor_date(date, "month")) %>%
-  summarize(views=sum(views)) 
+  summarize(views=sum(views))
+df$surveillence <- 'before'
+df$surveillence[df$month >= '2013-06-01'] <- 'after'
 
-monthly_agg$surveillence <- 'before'
-monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after'
+model <- lm(views ~ month + surveillence + month*surveillence, data = df)
+print(summary(model))
 
-model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg)
-summary(model)
 
-monthly_agg$prediction <- predict(model, monthly_agg)
-monthly_agg$se <- predict(model, monthly_agg,
+df$prediction <- predict(model, df)
+df$se <- predict(model, df,
                       se.fit = TRUE)$se.fit
 z.val <- qnorm(1 - (1 - 0.90)/2)
-monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se
-monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se
+df$LoCI <- df$prediction - z.val * df$se
+df$HiCI <- df$prediction + z.val * df$se
 
-monthly_agg$month <- ymd(monthly_agg$month)
+df$month <- ymd(df$month)
 
-ggplot(monthly_agg,
+ggplot(df,
        aes(x = month,
            y = prediction)) +
   geom_smooth(aes(ymin = LoCI, 
                   ymax = HiCI,
                   color = surveillence),
               stat = "identity") +
-  geom_point(data = monthly_agg, aes(x=month, y = views)) +
+  geom_point(data = df, aes(x=month, y = views)) +
   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') +
   ylab('Views') +
   xlab('Time (monthly)') +
   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) +
-  scale_y_continuous(labels = comma)
+  scale_y_continuous(labels = comma) +
+  ggtitle(gg_title)
+}
 ```
+
+```{r}
+lm_plot_topic(terrorism_data, 'Terrorism-related keywords trend before and after June 2013')
+```
+
+```{r}
+lm_plot_topic(popular_data, 'Popular keywords trend before and after June 2013')
+```
+
+```{r}
+lm_plot_topic(infra_data, 'Infrastructure security-related keywords trend before and after June 2013')
+```
+
 
 
 
