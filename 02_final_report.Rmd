@@ -34,9 +34,15 @@ load("data/infra_data.RData")
 load("data/popular_data.RData")
 ```
 
+## 2.1 Data
 
+## 2.2 Methodology
 
-## 2.1 Total views of terrorism-related keywords before and after the incident
+## 2.3 Criticism
+
+## 2.4 Replication Results
+
+### 2.4.1 Total views of terrorism-related keywords before and after the incident
 
 ```{r}
 terrorism_data %>%
@@ -52,7 +58,11 @@ terrorism_data %>%
   ggtitle("Total views of terrorism-related keywords before and after the incident")
 ```
 
-## 2.2 Linear model with interactions: Analysis and Plots
+### 2.4.2 Linear model with interactions: Analysis and Plots
+
+![Original result for terrorism-related keywords](img/terror.png)
+
+![Original regression summary for terrorism-related keywords](img/terror_regression_summary.png)
 
 ```{r }
 lm_plot_topic <- function(input_df, gg_title){
