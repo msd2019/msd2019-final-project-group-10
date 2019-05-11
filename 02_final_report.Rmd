@@ -1,6 +1,6 @@
 ---
 title: "MSD 2019 Final Project"
-subtitle: "A replication and extension of hilling Effects: Online Surveillance and Wikipedia Use by Jonathon W. Penney, Berkeley Technology Law Journal"
+subtitle: "A replication and extension of Chilling Effects: Online Surveillance and Wikipedia Use by Jonathon W. Penney, Berkeley Technology Law Journal"
 author: "Thanaspakorn Niyomkarn, Alex Li Kong, and Sang Won Lee (tn2381, alk2225, and sl4447)"
 date: '`r Sys.time()`'
 output:
@@ -9,7 +9,14 @@ output:
     toc_depth: 3
 ---
 
+# 1. Introduction
+
+This Rmd file attempts to replicate and extend the results in Chilling Effects: Online Surveillance and Wikipedia Use by Jonathon W. Penney in Berkeley Technology Law Journal. The author is a research fellow at University of Toronto. This single author paper has H5-index of 21. This paper is about the NSA/PRISM surveillance 2007, where United States National Security Agency (NSA) started collecting Internet communications from various US Internet companies. This information was made public in 2013 by Edward Snowden revelations. This paper deals with the NSA paranoia where the paper studies traffic to Wikipedia articles on topics that raise privacy concerns for Wikipedia users before and after the Edward Snowden revelations. The Wikipedia traffic was chosen because over 50% of Internet users use Wikipedia as a source of information. Over 1/3 of Americans annually access Wikipedia as a source of information and is in top 10 of most popular sites on the internet.
+
+
+
 ```{r setup, include=FALSE}
+library(scales)
 library(tidyverse)
 library(lubridate)
 library(wikipediatrend)
@@ -29,7 +36,7 @@ load("data/popular_data.RData")
 
 
 
-## Total views of terrorism-related keywords before and after the incident
+## 2.1 Total views of terrorism-related keywords before and after the incident
 
 ```{r}
 terrorism_data %>%
@@ -45,8 +52,7 @@ terrorism_data %>%
   ggtitle("Total views of terrorism-related keywords before and after the incident")
 ```
 
-
-
+## 2.2 Linear model with interactions: Analysis and Plots
 
 ```{r example}
 lm_plot_topic <- function(input_df, gg_title){
@@ -102,7 +108,904 @@ lm_plot_topic(infra_data, 'Infrastructure security-related keywords trend before
 ```
 
 
+<!-- ## Trend Recovery -->
 
+<!-- ```{r , echo=FALSE} -->
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+<!-- save(trend_data, file = "terrorism_May_11.RData") -->
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+<!-- summary(model) -->
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+<!-- ggplot(monthly_agg, -->
+<!--        aes(x = month, -->
+<!--            y = prediction)) + -->
+<!--   geom_smooth(aes(ymin = LoCI, -->
+<!--                   ymax = HiCI, -->
+<!--                   color = surveillence), -->
+<!--               stat = "identity") + -->
+<!--   geom_point(data = monthly_agg, aes(x=month, y = views)) + -->
+<!--   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') + -->
+<!--   ylab('Views') + -->
+<!--   xlab('Time (monthly)') + -->
+<!--   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) + -->
+<!--   scale_y_continuous(labels = comma) -->
+<!-- ``` -->
+<!-- ```{r , echo=FALSE} -->
+
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+<!-- summary(model) -->
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+<!-- ggplot(monthly_agg, -->
+<!--        aes(x = month, -->
+<!--            y = prediction)) + -->
+<!--   geom_smooth(aes(ymin = LoCI, -->
+<!--                   ymax = HiCI, -->
+<!--                   color = surveillence), -->
+<!--               stat = "identity") + -->
+<!--   geom_point(data = monthly_agg, aes(x=month, y = views)) + -->
+<!--   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2015-12-31'), linetype = 2, colour = 'blue') + -->
+<!--   ylab('Views') + -->
+<!--   xlab('Time (monthly)') + -->
+<!--   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) + -->
+<!--   scale_y_continuous(labels = comma) -->
+
+<!-- ``` -->
+<!-- ```{r , echo=FALSE} -->
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2014-12-3'] <- 'after_after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+<!-- summary(model) -->
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+<!-- ggplot(monthly_agg, -->
+<!--        aes(x = month, -->
+<!--            y = prediction)) + -->
+<!--   geom_smooth(aes(ymin = LoCI, -->
+<!--                   ymax = HiCI, -->
+<!--                   color = surveillence), -->
+<!--               stat = "identity") + -->
+<!--   geom_point(data = monthly_agg, aes(x=month, y = views)) + -->
+<!--   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2014-12-3'), linetype = 2, colour = 'blue') + -->
+<!--   ylab('Views') + -->
+<!--   xlab('Time (monthly)') + -->
+<!--   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) + -->
+<!--    theme_bw(base_size = 5) + -->
+<!--   scale_y_continuous(labels = comma) -->
+
+
+<!-- ``` -->
+
+
+
+<!-- ```{r , echo=FALSE} -->
+
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+<!-- summary(model) -->
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+<!-- ggplot(monthly_agg, -->
+<!--        aes(x = month, -->
+<!--            y = views)) + -->
+<!--   geom_smooth(aes(ymin = 0, -->
+<!--                   ymax = 0, -->
+<!--                   color = surveillence), -->
+<!--               stat = "identity") + -->
+<!--   geom_point(data = monthly_agg, aes(x=month, y = views)) + -->
+<!--   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2015-12-31'), linetype = 2, colour = 'blue') + -->
+<!--   ylab('Views') + -->
+<!--   xlab('Time (monthly)') + -->
+<!--   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) + -->
+<!--   scale_y_continuous(labels = comma) -->
+
+<!-- ``` -->
+
+
+
+<!-- ```{r , echo=FALSE} -->
+
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+<!-- summary(model) -->
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+<!-- ggplot(monthly_agg, -->
+<!--        aes(x = month, -->
+<!--            y = views)) + -->
+
+<!--   geom_point(data = monthly_agg, aes(x=month, y = views)) + -->
+<!--   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2014-12-31'), linetype = 2, colour = 'blue') + -->
+<!--   ylab('Views') + -->
+<!--   xlab('Time (monthly)') + -->
+<!--   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) + -->
+<!--    theme_bw(base_size = 5) + -->
+<!--   scale_y_continuous(labels = comma) -->
+
+<!-- ``` -->
+
+
+
+
+<!-- ```{r , echo=FALSE} -->
+
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+
+<!-- #fit <- lm(views ~ month + I(month^2), data = monthly_agg) -->
+
+<!-- #plot(views~month) -->
+<!-- #points(month, fitted(fit), col='red', pch=20) -->
+
+<!-- ggplot(monthly_agg, -->
+<!--        aes(x = month, -->
+<!--            y = views)) + geom_point()+stat_smooth(se=T)+ -->
+
+<!--   geom_point(data = monthly_agg, aes(x=month, y = views)) + -->
+<!--   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2015-12-31'), linetype = 2, colour = 'blue') + -->
+<!--   ylab('Views') + -->
+<!--   xlab('Time (monthly)') + -->
+<!--   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) + -->
+<!--   scale_y_continuous(labels = comma) -->
+
+
+<!-- ``` -->
+
+
+
+
+
+
+<!-- ```{r , echo=FALSE} -->
+
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+
+<!-- #fit <- lm(views ~ month + I(month^2), data = monthly_agg) -->
+
+<!-- #plot(views~month) -->
+<!-- #points(month, fitted(fit), col='red', pch=20) -->
+
+<!-- ggplot(monthly_agg, -->
+<!--        aes(x = month, -->
+<!--            y = views)) + geom_point()+stat_smooth(method="loess", se=F)+ -->
+
+<!--   geom_point(data = monthly_agg, aes(x=month, y = views)) + -->
+<!--   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2015-12-31'), linetype = 2, colour = 'blue') + -->
+<!--   ylab('Views') + -->
+<!--   xlab('Time (monthly)') + -->
+<!--   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) + -->
+<!--   scale_y_continuous(labels = comma) -->
+
+
+<!-- ``` -->
+
+
+
+
+<!-- ```{r , echo=FALSE} -->
+
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+
+<!-- #fit <- lm(views ~ month + I(month^2), data = monthly_agg) -->
+
+<!-- #plot(views~month) -->
+<!-- #points(month, fitted(fit), col='red', pch=20) -->
+<!-- monthly_agg$month <- as.numeric(monthly_agg$month) -->
+<!-- fit <- lm(views~poly(month,5,raw=TRUE),monthly_agg) -->
+<!-- plot(views~month,monthly_agg) -->
+<!-- curve(predict(fit,newdata=data.frame(month=x)),add=T) -->
+<!-- ``` -->
+
+
+
+
+
+<!-- ```{r , echo=FALSE} -->
+
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+
+<!-- #fit <- lm(views ~ month + I(month^2), data = monthly_agg) -->
+
+<!-- #plot(views~month) -->
+<!-- #points(month, fitted(fit), col='red', pch=20) -->
+
+<!-- ggplot(monthly_agg, -->
+<!--        aes(x = month, -->
+<!--            y = views)) + geom_point()+stat_smooth( se=T)+ -->
+
+<!--   geom_point(data = monthly_agg, aes(x=month, y = views)) + -->
+<!--   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2014-12-3'), linetype = 2, colour = 'blue') + -->
+<!--   ylab('Views') + -->
+<!--   xlab('Time (monthly)') + -->
+<!--   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) + -->
+<!--   theme_bw(base_size = 5) + -->
+<!--   scale_y_continuous(labels = comma) -->
+
+
+<!-- ``` -->
+
+
+
+<!-- ```{r , echo=FALSE} -->
+
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+
+
+
+<!-- #fit <- lm(views ~ month + I(month^2), data = monthly_agg) -->
+
+<!-- #plot(views~month) -->
+<!-- #points(month, fitted(fit), col='red', pch=20) -->
+<!-- monthly_agg$month <- as.numeric(monthly_agg$month) -->
+<!-- fit <- lm(views~poly(month,5,raw=TRUE),monthly_agg) -->
+<!-- plot(views~month,monthly_agg) -->
+<!-- curve(predict(fit,newdata=data.frame(month=x)),add=T) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r , echo=FALSE} -->
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2014-12-3" -->
+<!--   ) -->
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+<!-- summary(model) -->
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+<!-- plot_before <- monthly_agg$views[monthly_agg$month < '2013-06-01'] -->
+<!-- plot_after <- monthly_agg$views[monthly_agg$month >= '2013-06-01'] -->
+
+<!-- plot_before <- sum(plot_before) -->
+<!-- plot_after <- sum(plot_after) -->
+
+<!-- df <- data.frame(Date1=c("After_June_2013", "Before_June_2013"), -->
+<!--                 Total_Views=c(plot_after, plot_before)) -->
+<!-- df$Date <- factor(df$Date1, c("Before_June_2013", "After_June_2013")) -->
+<!-- ggplot(data=df, aes(x=Date, y=Total_Views, width=0.2)) + -->
+<!--   scale_y_continuous(name="Total Views", labels = comma) + -->
+<!--   theme_bw(base_size = 10) + -->
+<!--   geom_bar(stat="identity") -->
+
+
+<!-- ``` -->
+
+
+
+
+<!-- ```{r , echo=FALSE} -->
+
+<!-- terrorism_topics <- c('Al-Qaeda', 'Terrorism', 'Terror', 'Environmental_terrorism', 'Eco-terrorism', 'Conventional_weapon', 'Weapons-grade', 'Dirty_bomb', 'Nuclear_enrichment', 'nuclear') -->
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2015-12-31" -->
+<!--   ) -->
+
+
+
+<!-- trend_data <- -->
+<!--   wp_trend( -->
+<!--     page = terrorism_topics, -->
+<!--     lang = "en", -->
+<!--     from = "2011-12-01", -->
+<!--     to   = "2019-04-10" -->
+<!--   ) -->
+
+
+<!-- #plot(trend_data) -->
+
+<!-- #trend_data %>% -->
+<!-- #  group_by(article, month=floor_date(date, "month")) %>% -->
+<!-- #  summarize(views=sum(views)) %>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point(aes(color = article)) -->
+
+<!-- monthly_agg <- trend_data %>% -->
+<!--   group_by(month=floor_date(date, "month")) %>% -->
+<!--   summarize(views=sum(views)) -->
+<!-- #%>% -->
+<!-- #  ggplot(aes(x = month, y = views)) + -->
+<!-- #  geom_point() -->
+
+<!-- monthly_agg$surveillence <- 'before' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2014-12-3'] <- 'after_after' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2016-06-3'] <- 'after_after_after' -->
+<!-- monthly_agg$surveillence[monthly_agg$month >= '2016-06-3'] <- 'after_after_after_after' -->
+
+<!-- model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg) -->
+<!-- summary(model) -->
+
+<!-- #plot(predict(model, monthly_agg)) -->
+
+<!-- monthly_agg$prediction <- predict(model, monthly_agg) -->
+<!-- monthly_agg$se <- predict(model, monthly_agg, -->
+<!--                       se.fit = TRUE)$se.fit -->
+<!-- z.val <- qnorm(1 - (1 - 0.90)/2) -->
+<!-- monthly_agg$LoCI <- monthly_agg$prediction - z.val * monthly_agg$se -->
+<!-- monthly_agg$HiCI <- monthly_agg$prediction + z.val * monthly_agg$se -->
+<!-- #effect_plot(model, pred = view, interval = TRUE, plot.points = TRUE) -->
+
+<!-- monthly_agg$month <- ymd(monthly_agg$month) -->
+
+<!-- ggplot(monthly_agg, -->
+<!--        aes(x = month, -->
+<!--            y = prediction)) + -->
+<!--   geom_smooth(aes(ymin = LoCI, -->
+<!--                   ymax = HiCI, -->
+<!--                   color = surveillence), -->
+<!--               stat = "identity") + -->
+<!--   geom_point(data = monthly_agg, aes(x=month, y = views)) + -->
+<!--   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2014-12-3'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2016-06-3'), linetype = 2, colour = 'blue') + -->
+<!--   geom_vline(xintercept = as.Date('2016-06-3'), linetype = 2, colour = 'blue') + -->
+<!--   ylab('Views') + -->
+<!--   xlab('Time (monthly)') + -->
+<!--   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) + -->
+<!--    theme_bw(base_size = 5) + -->
+<!--   scale_y_continuous(labels = comma) -->
+
+
+<!-- ``` -->
 
 
 The following is a list of all packages used to generate these results. (Leave at very end of file.)
