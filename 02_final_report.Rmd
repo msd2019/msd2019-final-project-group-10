@@ -9,12 +9,6 @@ output:
     toc_depth: 3
 ---
 
-# 1. Introduction
-
-This Rmd file attempts to replicate and extend the results in Chilling Effects: Online Surveillance and Wikipedia Use by Jonathon W. Penney in Berkeley Technology Law Journal. The author is a research fellow at University of Toronto. This single author paper has H5-index of 21. This paper is about the NSA/PRISM surveillance 2007, where United States National Security Agency (NSA) started collecting Internet communications from various US Internet companies. This information was made public in 2013 by Edward Snowden revelations. This paper deals with the NSA paranoia where the paper studies traffic to Wikipedia articles on topics that raise privacy concerns for Wikipedia users before and after the Edward Snowden revelations. The Wikipedia traffic was chosen because over 50% of Internet users use Wikipedia as a source of information. Over 1/3 of Americans annually access Wikipedia as a source of information and is in top 10 of most popular sites on the internet.
-
-
-
 ```{r setup, include=FALSE}
 library(scales)
 library(tidyverse)
@@ -26,21 +20,60 @@ theme_set(theme_bw())
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# 1. Introduction
+
+This Rmd file attempts to replicate and extend the results in Chilling Effects: Online Surveillance and Wikipedia Use by Jonathon W. Penney in Berkeley Technology Law Journal. The author is a research fellow at University of Toronto. This single author paper has H5-index of 21. This paper is about the NSA/PRISM surveillance 2007, where United States National Security Agency (NSA) started collecting Internet communications from various US Internet companies. This information was made public in 2013 by Edward Snowden revelations. This paper deals with the NSA paranoia where the paper studies traffic to Wikipedia articles on topics that raise privacy concerns for Wikipedia users before and after the Edward Snowden revelations. The Wikipedia traffic was chosen because over 50% of Internet users use Wikipedia as a source of information. Over 1/3 of Americans annually access Wikipedia as a source of information and is in top 10 of most popular sites on the internet.
+
 # 2. Reproducing the Original Study
+
+Our group decide to reproduce the main analysis of the study which is the study about the discontinuity of the trend of views on Wikipedia articles. Although the data is time series, linear regression is a good way to capture the trend since our main goal is not predicting the exact number of views. The linear model used in the study is:
+$$Y_t = \beta_0 + \beta_1 time + \beta_2 intervention + \beta_3 postslope$$
+The model can be interpret as an ordinary regression for data at the time before the revelation of the surveilance in June 2013. For the data after the incident, an interaction is added to both intercept and slope, 0 if data is before and 1 for after. 'Intervention' or change in level is the binary value multiply with a weight which indicates the changing intercept after the event. 'Postslope' or change in slope is the binary value multiply with time indicating change in trend. 
+
+## 2.1 Data
+
+The study uses a list of keywords the U.S. Department of Homeland Security uses to track and monitor social media. Keyword selection and ranking are done using a survey on Amazon’s Mechanical Turk (MTurk) asking their opinions about topics on ‘Government trouble’, ‘Browser delete’, ‘Privacy sensitive’, ‘Avoidance’. Then all the scores are averaged to a single value called 'Combined privacy rating'. 
+
+The paper uses data from stats.grok.se which has stopped being updated as of January 2016 and the server is down at the moment. Our group chose to use an alternative data source from Wikipediatrend package in R (https://github.com/petermeissner/wikipediatrend) which allows user to specify page names, languages, start and end date of data and the library will return daily views for the articles.
+
+![Sample keywords and their privacy score](img/privacy_score.png)
+
+
+## 2.2 Methodology
+
+The analysis will be done of different set of keywords such as terrism-related article which is expected to change and popular articles which is used as a baseline. The author concludes that there exists a change in trend if coefficients of the interaction terms are significant. Here is the example of regression analysis for terrorism-related articles.
+
+![Original regression summary for terrorism-related keywords](img/terror_regression_summary.png)
+
+The sample plots will be shown in the Replication Results section to compare with our results.
+
+## 2.3 Criticism
+
+### 2.3.1 Defining and removing outliers
+
+Outliers are treated before performing further analysis in this study. There are two mains type of data that are considered to be outliers. The first reason is unual events, for example the media coverage about dispute between Hamas and Israel. The other method is removing outliers by considering z-score. Both are reasonable way to deal with outliers. However, removing out might cause another problems such as missing data. Moreover, there is no clear rule to identify the events like news and other exposures for all the keywords.
+
+![Difference in regression results before and after removing outliers](img/outlier.png)
+
+### 2.3.2 Privacy ratings: data collection and calculation
+
+The first problem about data collection is the representation of the population (MTurk, Wikipedia, US Internet users). This issue is acknowledged by the author that the sample of people who did the survey have slightly lower incomes, slightly more male than female and use “websites and other online resources” for information more generally than the overall US population. The use of multiple proxies: Wikipedia as a representation of the internet usage and the opinion of MTurk users as public opinions might make the the result prone to more error.
+
+The second problem about data is how the topics are presented to the subjects. There exists some neutral keywords like ‘recruitment’ and ‘terror’ which their contents in Wikipedia does not related with terrorism. The opinion or privacy rating will be less credible if only the keywords are presented to the subjects not the actual webpage.
+
+Finally, the combined privacy rating is calculate by averaging ‘Government trouble’, ‘Browser delete’, ‘Privacy sensitive’, ‘Avoidance’ assumes that all the factors are equally importance which is difficult to prove the validity.
+
+### 2.3.3 Result interpretation
+
+Theinterpretation of results focus on the significance of coefficients, however it does not provide the sense of magnitude or direction of the change. For example a trend might change for increasing to highly increasing or decreasing and both would give significant results. Moreover, the overall trend might be dominated by few keywords. Our group comes up with the solution to this problem and performs an alternative analysis in the Per-keyword Analysis section.
+
+## 2.4 Replication Results
 
 ```{r load data}
 load("data/terrorism_data.RData")
 load("data/infra_data.RData")
 load("data/popular_data.RData")
 ```
-
-## 2.1 Data
-
-## 2.2 Methodology
-
-## 2.3 Criticism
-
-## 2.4 Replication Results
 
 ### 2.4.1 Total views of terrorism-related keywords before and after the incident
 
@@ -60,9 +93,6 @@ terrorism_data %>%
 
 ### 2.4.2 Linear model with interactions: Analysis and Plots
 
-![Original result for terrorism-related keywords](img/terror.png)
-
-![Original regression summary for terrorism-related keywords](img/terror_regression_summary.png)
 
 ```{r }
 lm_plot_topic <- function(input_df, gg_title){
@@ -104,6 +134,7 @@ ggplot(df,
 }
 ```
 
+![Original result for terrorism-related keywords](img/terror.png)
 
 ```{r}
 lm_plot_topic(terrorism_data, 'Terrorism-related keywords trend before and after June 2013')
