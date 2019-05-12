@@ -8,7 +8,7 @@ A complete report of our results is in `02_final_report.pdf`, which can be gener
 
 The repository is structured as follows:
 
-1. `01_get_all_data.sh` gets the original data used by the authors and places a copy in `data/` It also gets new data used for our extended research. 
+1. `01_get_all_data.R` gets the original data used by the authors and places a copy in `data/` It also gets new data used for our extended research. 
 2. `02_final_report.Rmd` analysis both the original and new data to replicate and extend the results of the original paper, and produces the final report `02_final_report.pdf`
 
 ----
