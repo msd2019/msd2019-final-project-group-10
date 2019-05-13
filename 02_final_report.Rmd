@@ -170,7 +170,7 @@ In summary, the reproduced analysis shows that the results can be reproduced usi
 
 # 3. Extended Analysis
 
-## 3.1 Longer Trend Analysis
+## 3.1 Longer Trend Analysis and Trend Recovery
 
 The link to our data broke on Saturday May 11th, 2019. Our original plots consisted data from 2012 to 2019. Our group tried to reconstruct the graph from data that was saved on our laptops before the link broke, which is until 2015. Luckly we have original graphs saved as png file. After each reproduced graphs, we included what they used to look like before the link broke, and full data was available. 
 
