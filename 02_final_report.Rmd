@@ -205,10 +205,6 @@ ggplot(monthly_agg,
 ```
 
 First, we take out all the line graphs, and plot scattered graph according to data. 
-The original graph with full data is shown above.
-
-![Original Scatter Plot with full data](img/Picture1.png)
-
 
 
 ```{r}
@@ -241,14 +237,6 @@ ggplot(monthly_agg,
 
 Then, our group had fit a polynomial surface determined by one or more numerical predictors, using local fitting. The graph also displays confidence interval around as gray. The graph below shows rise in trend from 2015 January to July 2016. The graph trend again drops from July 2016 to Jan 2019. The views counts are similar at the beginning of 2016 and end of plot at 2019. This shows that there has been a "trend reovery," but the trend again drops without second "Snowden Revelation." This may mean that the decrease in trend from 2013 to 2015 may be due to other factors rather than due to NSA paranoia.
 
-The original graph with full data is shown below.
-
-
-
-
-
-
-![Original Stat Smooth Curve with full data](img/Picture2.png)
 
 ```{r}
 monthly_agg <- terrorism_data_long %>% 
@@ -274,18 +262,6 @@ curve(predict(fit,newdata=data.frame(month=x)),add=T)
 Then, our group had went further and fit a polynomial graph of degree 4. The curve above shows that there is sharper decrease in trend at the end of graph, far from 2013 region. This again backs our claim that there is a decrease in 2018 to 2019 without another "Snowden Revelation." This means the decrease in trend after 2013 can be attributed to another resason than Snowden Revelation. 
 
 
-
-
-
-
-
-
-
-
-
-
-![Original Polynomial curve n4 with full data](img/Picture3.png)
-
 ```{r}
 monthly_agg <- terrorism_data_long %>% 
   group_by(month=floor_date(date, "month")) %>%
@@ -309,11 +285,6 @@ curve(predict(fit,newdata=data.frame(month=x)),add=T)
 Then, our group had went further and fit a polynomial graph of degree 5 instead of 4. This may be overfitting, but wanted to analyze the graph to full extent. This graph also shows that there has been decrease in trend from 2018 to 2019, but end of the trend is actually increasing. This fluctuating trend shows that author of original paper's claim that chilling effect is not caused due to NSA paranoia. 
 
 
-
-
-
-![Original Polynomial curve n5 with full data](img/Picture4.png)
-
 ```{r}
 monthly_agg <- terrorism_data_long %>% 
   group_by(month=floor_date(date, "month")) %>%
@@ -347,16 +318,7 @@ ggplot(monthly_agg,
   scale_y_continuous(labels = comma)
 ```
 
-The graph below shows that there is stable trend after January 2015. This graph shows that view after 2015 is higher than from 2013 to 2015. This is only graph that may support author's claim that there had been a trend recovery, and trend stays constant. However, the data is not segmented in equal time bins. This made our group explore further in equal time segmetents of trends after 2015, in the following works below. 
-
-
-
-
-
-
-
-
-![Original Graph with full data](img/Picture5.png)
+The graph below shows that there is stable trend after January 2015. This graph shows that view after 2015 is higher than from 2013 to 2015. This is only graph that may support author's claim that there had been a trend recovery, and trend stays constant. However, the data is not segmented in equal time bins. This made our group explore further in equal time segmetents of trends after 2015 plotted in green. 
 
 
 
@@ -369,7 +331,7 @@ monthly_agg$surveillence <- 'before'
 monthly_agg$surveillence[monthly_agg$month >= '2013-06-01'] <- 'after'
 monthly_agg$surveillence[monthly_agg$month >= '2014-12-3'] <- 'after_after'
 monthly_agg$surveillence[monthly_agg$month >= '2016-06-3'] <- 'after_after_after'
-monthly_agg$surveillence[monthly_agg$month >= '2016-06-3'] <- 'after_after_after_after'
+monthly_agg$surveillence[monthly_agg$month >= '2017-12-3'] <- 'after_after_after_after'
 model <- lm(views ~ month + surveillence + month*surveillence, data = monthly_agg)
 summary(model)
 monthly_agg$prediction <- predict(model, monthly_agg)
@@ -390,7 +352,7 @@ ggplot(monthly_agg,
   geom_vline(xintercept = as.Date('2013-06-01'), linetype = 2, colour = 'blue') +
   geom_vline(xintercept = as.Date('2014-12-3'), linetype = 2, colour = 'blue') +
   geom_vline(xintercept = as.Date('2016-06-3'), linetype = 2, colour = 'blue') +
-  geom_vline(xintercept = as.Date('2016-06-3'), linetype = 2, colour = 'blue') +
+  geom_vline(xintercept = as.Date('2017-12-3'), linetype = 2, colour = 'blue') +
   ylab('Views') +
   xlab('Time (monthly)') +
   scale_x_date(date_breaks = "6 month", labels = date_format("%Y-%b")) +
@@ -399,10 +361,6 @@ ggplot(monthly_agg,
 ```
 
 Now, our group had seperated the data into equal segments. The graph above shows trend recovery from Jan 2015 to July 2016, trend decrease from July 2016 to Jan 2018, then a stable trend from Jan 2018 to July 2019. This fluctuations may again raise question to paper's author's claim that there exists chilling effect due to Snowden Revelation. 
-
-<p>
-![Original Segmented plot with full data](img/Picture6.png)
-</p>
 
 ## 3.2 Per-keyword Analysis
 
