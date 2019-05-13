@@ -27,7 +27,9 @@ This Rmd file attempts to replicate and extend the results in Chilling Effects: 
 # 2. Reproducing the Original Study
 
 Our group decide to reproduce the main analysis of the study which is the study about the discontinuity of the trend of views on Wikipedia articles. Although the data is time series, linear regression is a good way to capture the trend since our main goal is not predicting the exact number of views. The linear model used in the study is:
+
 $$Y_t = \beta_0 + \beta_1 time + \beta_2 intervention + \beta_3 postslope$$
+
 The model can be interpret as an ordinary regression for data at the time before the revelation of the surveilance in June 2013. For the data after the incident, an interaction is added to both intercept and slope, 0 if data is before and 1 for after. 'Intervention' or change in level is the binary value multiply with a weight which indicates the changing intercept after the event. 'Postslope' or change in slope is the binary value multiply with time indicating change in trend. 
 
 ## 2.1 Data
@@ -78,6 +80,8 @@ load("data/terrorism_data_long.RData")
 
 ### 2.4.1 Total views of terrorism-related keywords before and after the incident
 
+![Bar chart comparing monthly views before and after June 2013](img/barchart_pre_post.png)
+
 ```{r}
 terrorism_data %>%
   mutate(before_after = ifelse(date < '2013-06-01', "Before_June_2013", "After_June_2013")) %>%
@@ -92,8 +96,11 @@ terrorism_data %>%
   ggtitle("Total views of terrorism-related keywords before and after the incident")
 ```
 
+This plot aims to vaguely prove the simple belief that the behaviors tend to change after the incident indicating 'chilling effect' which can be observed by the decrease of the views on Wikipedia article. Our relplication has the same trend of decreasing volume, however the number are not exactly the same because we count the number of views 1.5 years before and after the incident. Moreover, it is not clear which keywords or if all of traffic is used to produced the original graph. This chart sparks the idea of existence of the effect that will be investigated further in following sections.
+
 ### 2.4.2 Linear model with interactions: Analysis and Plots
 
+Based on the linear model with interactions discussed earlier, we decide to implement it on three of the topics, terrorism, infrastructure security, and most popular topics. Our replications include both plots and regression analysis for eaxh topics. Keywords within each topic can be found in the appendix of the paper. We have an assumption that the difference between results are mostly due to the difference in data. We did not perform any treatment to outliers before any analysis since the method is not cleary established.
 
 ```{r }
 lm_plot_topic <- function(input_df, gg_title){
@@ -141,14 +148,25 @@ ggplot(df,
 lm_plot_topic(terrorism_data, 'Terrorism-related keywords trend before and after June 2013')
 ```
 
+The result for terrorism-related articles are very similar to the paper.  We got the plot where the trend change from increasing to decreasing and the level is shifted down around 200,000 views. Both coefficients for change in trend and level are significant which is the same as in the original study.
+
+![Original result for popular keywords](img/popular.png)
+
 ```{r}
 lm_plot_topic(popular_data, 'Popular keywords trend before and after June 2013')
 ```
+
+For most popular articles, our results are quite different from the reference where the trend went slightly down before the event and went up after. Our result is more similar to the terrorism case in term of the trend, but with less change. However, there is almost no shift in level which is same as in the paper. The regression coefficients are significant with lower level, unlike those in the paper which is not significant. However, we would like to mention that the data is quite different both general and outliers.
+
+![Original result for infra-structure security keywords](img/infra.png)
 
 ```{r}
 lm_plot_topic(infra_data, 'Infrastructure security-related keywords trend before and after June 2013')
 ```
 
+The result is similar to the paper that the trend keeps going down even after the incident. Our result shows slightly steeper trend which may be caused by the few outliers at July to September 2014. Our regression give the significance for the coefficients while they are not significant in the study.
+
+In summary, the reproduced analysis shows that the results can be reproduced using the same regression model. However, it also points out the importance of the way we deal with outliers which greatly affects the analysis. The difference in data source also causes the discrepancy among results. Finally, it raises an interesting point about coefficients that which can be significant regardless of the change in trend and level. We attempt to quantify the change in section 3.2.
 
 # 3. Extended Analysis
 
@@ -466,7 +484,7 @@ model2 <- lm(views ~ month, data = df2)
 
 null_pred <- predict(model2, df %>% filter(surveillence != 'before'))
 null_rmse <- sqrt(mean((null_pred - df$views[df$surveillence != 'before'])^2))
-return(c(mean(int_pred - null_pred), interaction_rmse-null_rmse))
+return(c(mean((int_pred - null_pred)), interaction_rmse-null_rmse))
 }
 
 diff <- c()
@@ -479,13 +497,20 @@ for(i in unique(terrorism_data$article)){
 }
 
 diff_results <- data.frame("mean_difference" = diff, "rmse_difference" = diff_rmses)
+```
 
-ggplot(diff_results, aes(x = mean_difference)) + 
-  geom_histogram(boundary = 0, bins = 20, color = 'grey')
-
+```{r}
 ggplot(diff_results, aes(x = rmse_difference)) + 
   geom_histogram(boundary = 0, bins = 20, color = 'grey')
 ```
+
+The histogram shows
+
+```{r}
+ggplot(diff_results, aes(x = mean_difference)) + 
+  geom_histogram(boundary = 0, bins = 20, color = 'grey')
+```
+
 
 
 ## 3.3 Time-series Analysis
