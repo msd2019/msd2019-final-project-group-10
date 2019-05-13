@@ -491,6 +491,186 @@ The histogram of average of relative change in prediction tells us that most of 
 ## 3.3 Time-series Analysis
 
 
+In this part of the analysis, we wish to explore just how valid the claims of the paper are, that search trends have changed in magnitude and direction pre- and post-Snowden.
+
+We begin our analysis by pulling data using the terrorism keyword list as specified in the paper. We sample the data from December 1, 2011 to December 30, 2015. We also examine trends from the ranges of December 1, 2008 to December 31, 2018, as well as December 1, 2007 to May 1, 2018.
+
+```{r}
+require(wikipediatrend)
+require(tidyverse)
+require(lubridate)
+require(astsa)
+require(scales)
+```
+
+The trend data from December 1, 2011 to December 31, 2015 is stored in wiki_monthly.
+
+```{r}
+wiki_monthly <- terrorism_data_2005_present %>% 
+  filter(date >= '2011-12-01' & date <= '2015-12-31')
+wiki_monthly <- wiki_monthly %>% 
+  group_by(month=floor_date(date, "month")) %>%
+  summarize(views=sum(views))
+wiki_monthly
+```
+
+The trend data from December 1, 2008 to December 31, 2018 is stored in wiki_monthly_expanded.
+
+```{r}
+wiki_monthly_expanded <- terrorism_data_2005_present %>% 
+  filter(date >= '2008-12-01' & date <= '2018-12-31')
+wiki_monthly_expanded <- wiki_monthly_expanded %>% 
+  group_by(month=floor_date(date, "month")) %>%
+  summarize(views=sum(views))
+wiki_monthly_expanded
+```
+
+The trend data from December 1, 2007 to May 1, 2019 is stored in wiki_montly_expanded_more.
+
+```{r}
+wiki_monthly_expanded_more <- terrorism_data_2005_present %>% 
+  filter(date >= '2007-12-01' & date <= '2019-05-01')
+wiki_monthly_expanded_more <- wiki_monthly_expanded_more %>% 
+  group_by(month=floor_date(date, "month")) %>%
+  summarize(views=sum(views))
+wiki_monthly_expanded_more
+```
+
+When we look at the plot for wiki_monthly (December 1, 2011-December 31, 2015):
+
+```{r}
+ggplot(wiki_monthly, aes(month, views)) +
+  geom_line() + 
+  ggtitle('Wikipedia terrorism trends: December 1, 2011-December 1, 2015') +
+  geom_vline(xintercept=as.numeric(as.Date('2013-06-01'))) +
+  scale_x_date(labels=date_format('%Y-%m'), 
+               breaks=wiki_monthly$month[seq(1, length(wiki_monthly$month), 
+                                             by=3)])
+```
+
+there does appear to be a shift pre- and post- Snowden. However, based on some of the data post-Snowden, we need to examine further. Are these trends outliers, or is there credible evidence of significant drops in searches for these terms? We chose to sample over a larger time frame (the wiki_monthly_expanded data from December 1, 2008 to December 31, 2018) to see if this was the case.
+
+```{r}
+ggplot(wiki_monthly_expanded, aes(month, views)) +
+  geom_line() + 
+  ggtitle('Wikipedia terrorism trends: December 1, 2008-December 1, 2018') +
+  geom_vline(xintercept=as.numeric(as.Date('2013-06-01'))) +
+  scale_x_date(labels=date_format('%Y-%m'), 
+               breaks=wiki_monthly_expanded$month[seq(1, length(wiki_monthly_expanded$month), 
+                                                      by=6)])
+```
+
+When we examine the above plot, now it becomes far less obvious that the trend the paper claims exists. For one, it appears that searches, while fluctuating, are still centered around the same mean. In time-series analysis, we call this a stationary distribution (not perfectly, but about). It is true that search terms did increase from 2011 to 2013 and then decrease from 2013-2014, however, it does not appear that this shift is monumentous enough to warrant the paper's claim. The high point right before Snowden seems like a high outlier, and a few points in 2014 look like low outliers.
+
+All in all, the mean seems fairly centered, with a few outlier points that do not disrupt the stationary distriubtion.
+
+We see further evidence of this stationary distribution when we sample between December 1, 2007 and May 1, 2019 (the wiki_monthly_expanded_more dataset):
+
+```{r}
+ggplot(wiki_monthly_expanded_more, aes(month, views)) +
+  geom_line() + 
+  ggtitle('Wikipedia terrorism trends: December 1, 2007-May 1, 2019') +
+  geom_vline(xintercept=as.numeric(as.Date('2013-06-01'))) +
+  scale_x_date(labels=date_format('%Y-%m'), 
+               breaks=wiki_monthly_expanded_more$month[seq(1, length(wiki_monthly_expanded_more$month), 
+                                                           by=6)])
+```
+
+Because this graph was drawn at the very beginning of May, there are relatively few search terms for the terrorism terms listed. Otherwise, we see mostly the same stationary distribution.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+An interesting extension we looked at was to see if we could model this data with a time series model to see if we can capture the patterns in this time series. AR models work very well as a simple example because, in a nutshell, they use the nth previous time series data points to predict the future (and take into account an error term known as white noise). More complicated models such as ARMA, ARIMA, GARCH, and e-GARCH exist, however, for the purposes of exploration, we will stick to the baseline which has been shown to work well (like linear regression for regression analysis).
+
+The reason we chose to do a time series analysis is because the paper does not take a very strong time series based approach to their analysis. They used what is called an interrupted time series approach, which is another way of saying "we looked at the data before and after a certain event to look for changes in patterns over time". However, the paper did not take into account other factors which may have caused this trend change, such as seasonality.
+
+We use the wiki_monthly_expanded_more (December 1, 2007 to May 1, 2019) dataset, however, we first drop the datapoint for May 1, 2019, as only that day's data is being used to model the total number of views for May 2019. We attempt to model a simple AR(1) model on the data to start off (where the 1 means a 1st order regression):
+
+```{r}
+time_series_data <- wiki_monthly_expanded_more %>% filter(month < as.Date('2019-05-01'))
+time_series_data
+```
+
+```{r}
+acf2(time_series_data$views, max.lag=20, 
+     main='ACF and PACF on views aggregated from Dec 1, 2008 to Dec 31, 2018 duration')
+```
+
+Because the autocorrelation plot, or ACF, plot seems to monotonically decrease for the most part, an AR(1) model should work decently.
+
+```{r}
+ts_fit <- sarima(time_series_data$views, p=1, d=0, q=0)
+ts_fit
+```
+
+From the above plot, we notice a few problems with our AR(1) fit.
+
+*ACF of residuals: not inside the confidence interval for all lags
+*Normal Q-Q plot: not normal (this is an assumption the model makes)
+*Ljung-Box statistic: low p-values means we reject the null hypothesis that there are no more correlations we need to take into account. This means that our AR(1) model is too simple.
+
+The easy fix is to make a more complicated model. However, before we fit the model, we should examine the time series for outliers. We use the tsoutliers function to identify and replace outliers in our dataset:
+
+```{r}
+require(tsoutliers)
+```
+
+```{r}
+outlier_ts <- ts(time_series_data$views,frequency=1)
+data_outliers <- tso(outlier_ts)
+data_outliers
+plot(data_outliers)
+```
+
+For comparison, we plot the original time series data below:
+
+```{r}
+ggplot(time_series_data, aes(month, views)) +
+  geom_line() + 
+  ggtitle('Wikipedia terrorism trends: December 1, 2007-May 1, 2019') +
+  geom_vline(xintercept=as.numeric(as.Date('2013-06-01'))) +
+  scale_x_date(labels=date_format('%Y-%m'), 
+               breaks=time_series_data$month[seq(1, length(time_series_data$month), 
+                                                 by=6)])
+```
+
+This outlier plot shows that the claimed chilling effect seems to have been influenced by an anomalous increase in terrorism searches in the months just preceding pre-Snowden. This presents a problem for the chilling effect claim. It is quite possible that there still would have been a decrease in terrorism related searches. However, the claim that there was a significant increase in search volume in the months immediately prior to pre-Snowden is weakened. 
+
+It should also be noticed that it is unclear whether the sudden drop off in search volume from July 2014-December 2014 is actually caused by the chilling effect. While these are identified as low outliers, there is not the gradual decrease in search volume as specified by the paper. In the immediate months following post-Snowden, search terms simply regressed back to the mean and stayed there until the sudden nosedive in July 2014.
+
+At the same time, the time series analysis also shows that it is difficult to model views over time on a website due to frequent fluctuations which may result in outliers in the data. We choose to take the stance that, even if there was a chilling effect, it was potentially biased by points immediately pre-Snowden and rebounded quite well after an anomalous drop in terrorism search volume from July 1, 2014 to the paper's right endpoint on November 30, 2014. Thus, we use the outlier corrected time-series data to model continued trends.
+
+When we see the plot of the outlier corrected time-series data, we now see that the data is even more stationary, which is to be expected.
+
+```{r}
+plot(data_outliers$yadj)
+```
+
+We now attempt to plot the same AR(1) model to the outlier-adjusted values:
+
+```{r}
+ts_fit_adj <- sarima(data_outliers$yadj, p=1, d=0, q=0)
+ts_fit_adj
+```
+
+Clearly, we still need a more complicated model as indicated by the Ljung-Box statistic, however, we now see that the Q-Q plot looks much more normal (though by no means perfect) and the standardized residual plot looks much more stationary.
+
+Due to a the high autocorrelation values for lags 0 and 1, we choose to add a moving average component of 2 (which attempts to capture autocorrelation). Additionaly, we arbitrarily increase the degree of autoregression to 2 to account for slightly positive autocorrelation for lag 1. We thus obtain an ARMA(2, 2) model.
+
+```{r}
+acf2(data_outliers$yadj, max.lag=20, 
+     main='ACF and PACF on views aggregated from Dec 1, 2007 to April 30, 2019 duration')
+```
+
+```{r}
+ts_fit_adj_ma <- sarima(data_outliers$yadj, p=2, d=0, q=2)
+ts_fit_adj_ma
+```
+
+Although our model appears to have captured all of the serial autocorrelation according to the Ljung-Box statistic, our Q-Q plot for standard residuals looks much worse. Clearly, we need to be careful with tuning our parameters.
+
+Accounting for the removal of outliers, it is clear that even a simple ARMA model performs as a decent baseline for future time series models. We thus conclude that, looking at a larger time frame, even though a chilling effect may have taken place, it was only a small blip in the grand scheme of things. Overall, terrorism search trends over time have not changed.
+
 # 4. Summary
 
 From the original study and the reproduced results, we can conclude that there exists the ‘Chilling Effect’. The Mass Surveillance does affect how people use the Internet (Wikipedia), if we use the coefficients and their significance as a metric. However, we also found that the outlliers and data processing affect the results greatly, especially for the control groups: infra structure-related and popular articles which do not have significance change in trend and level in the paper, but the changes are significant in our results.
@@ -499,7 +679,7 @@ In our longer trend analysis, our group had found that trend fluctuations shown 
 
 We investigate further into keyword-level analysis to quantify and decompose the total trend for terrorism-related keywords. We found that the model with interaction always gives better RMSE for all keywords. However, the small improvement raise the question about the impact that the surveilence actually causes. However, it is difficult to investigate further since the regression only captures trend not the exact views as discussed earlier. Moreover, we also found that all but one keywords have significant decrease in their trends. This can be analyzed further in future work whether the slopes change their sign or just decrease in magnitude.
 
-
+Finally, we attempted to use a more rigorous time series analysis to see if the paper's claimed trends hold over a longer period of time. We suspected, and confirmed, using time series analysis that some datapoints post-Snowden are indeed low outliers. However, this may or may not indicate the presence of the chilling effect, as these low outliers occured well after Snowden's revelations and appeared to be more of a sudden drop than a gradual decline. Additionally, we discovered that the increasing trends in the months immediately pre-Snowden were more anomalous than the norm considering the grand scheme of things. Using a time series model corrected for outliers, we show that, while there may have been a chilling effect, that the effects appeared more temporary than continuous. We can thus conclude that the chilling effect applies for a very short window pre- and post- Snowden but not for larger time frames.
 
 The following is a list of all packages used to generate these results. (Leave at very end of file.)
 
