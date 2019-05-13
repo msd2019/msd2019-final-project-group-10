@@ -75,7 +75,7 @@ Theinterpretation of results focus on the significance of coefficients, however 
 load("data/terrorism_data.RData")
 load("data/infra_data.RData")
 load("data/popular_data.RData")
-load("data/terrorism_data_long.RData")
+load("data/terrorism_data_2005_present.RData")
 ```
 
 ### 2.4.1 Total views of terrorism-related keywords before and after the incident
@@ -175,6 +175,8 @@ In summary, the reproduced analysis shows that the results can be reproduced usi
 The link to our data broke on Saturday May 11th, 2019. Our original plots consisted data from 2012 to 2019. Our group tried to reconstruct the graph from data that was saved on our laptops before the link broke, which is until 2015. Luckly we have original graphs saved as png file. After each reproduced graphs, we included what they used to look like before the link broke, and full data was available. 
 
 ```{r}
+terrorism_data_long <- terrorism_data_2005_present %>% filter(date >= '2011-12-01')
+
 monthly_agg <- terrorism_data_long %>% 
   group_by(month=floor_date(date, "month")) %>%
   summarize(views=sum(views)) 

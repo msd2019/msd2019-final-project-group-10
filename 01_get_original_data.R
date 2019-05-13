@@ -12,15 +12,15 @@ terrorism_data <-
 
 save(terrorism_data, file = "data/terrorism_data.RData")
 
-terrorism_data_long <- 
+terrorism_data_2005_present <- 
   wp_trend(
     page = terrorism_topics, 
     lang = "en", 
-    from = "2010-12-01",
-    to   = "2015-11-30"
+    from = "2005-12-01",
+    to   = Sys.Date()
   )
 
-save(terrorism_data, file = "data/terrorism_data_long.RData")
+save(terrorism_data_2005_present, file = "data/terrorism_data_2005_present.RData")
 
 popular_topics <- c('Facebook', 'Wiki', 'Lists_of_deaths_by_year#2012', 'One_Direction', 'The_Avengers_(2012_film)', 'Fifty_Shades_of_Grey', '2012_phenomenon', 'Google', 'The_Dark_Knight_Rises', 'The_Hunger_Games', 'Lists_of_deaths_by_year#2013', 'Breaking_Bad', 'G-force', 'World_War_II', 'YouTube', 'List_of_Bollywood_films_of_2013', 'United_States', 'Online_shopping', 'Java', 'Alive', 'Lists_of_deaths_by_year#2014', 'Climatic_Research_Unit_email_controversy', 'Amazon.com', '2014_FIFA_World_Cup', 'Ebola_virus_disease', 'Game_of_Thrones')
 
