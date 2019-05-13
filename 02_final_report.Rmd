@@ -172,8 +172,6 @@ In summary, the reproduced analysis shows that the results can be reproduced usi
 
 ## 3.1 Longer Trend Analysis and Trend Recovery
 
-The link to our data broke on Saturday May 11th, 2019. Our original plots consisted data from 2012 to 2019. Our group tried to reconstruct the graph from data that was saved on our laptops before the link broke, which is until 2015. Luckly we have original graphs saved as png file. After each reproduced graphs, we included what they used to look like before the link broke, and full data was available. 
-
 ```{r}
 terrorism_data_long <- terrorism_data_2005_present %>% filter(date >= '2011-12-01')
 
@@ -494,6 +492,10 @@ The histogram of average of relative change in prediction tells us that most of 
 
 
 # 4. Summary
+
+From the original study and the reproduced results, we can conclude that there exists the ‘Chilling Effect’. The Mass Surveillance does affect how people use the Internet (Wikipedia), if we use the coefficients and their significance as a metric. However, we also found that the outlliers and data processing affect the results greatly, especially for the control groups: infra structure-related and popular articles which do not have significance change in trend and level in the paper, but the changes are significant in our results.
+
+
 
 In our longer trend analysis, our group had found that trend fluctuations shown in polynomial  fit graphs (n=4,5) show that there the chilling effect in 2013 may have been caused due to other reasons rather than NSA paranoia. When our group had seperated the data into equal time segments. The graph shows trend recovery from Jan 2015 to July 2016, trend decrease from July 2016 to Jan 2018, then a stable trend from Jan 2018 to July 2019. Again, this fluctuations raise concern to paper's author's claim that there exists chilling effect due to Snowden Revelation. 
 
