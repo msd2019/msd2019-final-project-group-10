@@ -67,7 +67,7 @@ Finally, the combined privacy rating is calculate by averaging ‘Government tro
 
 ### 2.3.3 Result interpretation
 
-Theinterpretation of results focus on the significance of coefficients, however it does not provide the sense of magnitude or direction of the change. For example a trend might change for increasing to highly increasing or decreasing and both would give significant results. Moreover, the overall trend might be dominated by few keywords. Our group comes up with the solution to this problem and performs an alternative analysis in the Per-keyword Analysis section.
+Theinterpretation of results focus on the significance of coefficients, however it does not provide the sense of magnitude or direction of the change. For example a trend might change for increasing to highly increasing or decreasing and both would give significant results. Moreover, the overall trend might be dominated by few keywords. Our group comes up with the solution to this problem and performs an alternative analysis in the Keyword-level Analysis section.
 
 ## 2.4 Replication Results
 
@@ -360,7 +360,7 @@ ggplot(monthly_agg,
 
 Now, our group had seperated the data into equal segments. The graph above shows trend recovery from Jan 2015 to July 2016, trend decrease from July 2016 to Jan 2018, then a stable trend from Jan 2018 to July 2019. This fluctuations may again raise question to paper's author's claim that there exists chilling effect due to Snowden Revelation. 
 
-## 3.2 Per-keyword Analysis
+## 3.2 Keyword-level Analysis
 
 In this section, we will explore further on the trend of terrorism-related topics by looking into the trend of each article. The first part is visualizing some sample topics and the second part is quantifying the difference between the interaction model and the null model which use the trend of data before June 2013 to predict the views after the incident.
 
@@ -495,9 +495,9 @@ The histogram of average of relative change in prediction tells us that most of 
 
 From the original study and the reproduced results, we can conclude that there exists the ‘Chilling Effect’. The Mass Surveillance does affect how people use the Internet (Wikipedia), if we use the coefficients and their significance as a metric. However, we also found that the outlliers and data processing affect the results greatly, especially for the control groups: infra structure-related and popular articles which do not have significance change in trend and level in the paper, but the changes are significant in our results.
 
+In our longer trend analysis, our group had found that trend fluctuations shown in polynomial  fit graphs (n=4,5) show that there the chilling effect in 2013 may have been caused due to other reasons rather than NSA paranoia. When our group had seperated the data into equal time segments. The graph shows trend recovery from Jan 2015 to July 2016, trend decrease from July 2016 to Jan 2018, then a stable trend from Jan 2018 to July 2019. Again, this fluctuations raise concern to paper's author's claim that there exists chilling effect due to Snowden Revelation.
 
-
-In our longer trend analysis, our group had found that trend fluctuations shown in polynomial  fit graphs (n=4,5) show that there the chilling effect in 2013 may have been caused due to other reasons rather than NSA paranoia. When our group had seperated the data into equal time segments. The graph shows trend recovery from Jan 2015 to July 2016, trend decrease from July 2016 to Jan 2018, then a stable trend from Jan 2018 to July 2019. Again, this fluctuations raise concern to paper's author's claim that there exists chilling effect due to Snowden Revelation. 
+We investigate further into keyword-level analysis to quantify and decompose the total trend for terrorism-related keywords. We found that the model with interaction always gives better RMSE for all keywords. However, the small improvement raise the question about the impact that the surveilence actually causes. However, it is difficult to investigate further since the regression only captures trend not the exact views as discussed earlier. Moreover, we also found that all but one keywords have significant decrease in their trends. This can be analyzed further in future work whether the slopes change their sign or just decrease in magnitude.
 
 
 
